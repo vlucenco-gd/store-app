@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: store-app
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/storemdb
+  r2dbc:
+    password: password
+    url: r2dbc:mariadb://localhost:3306/storer2db
+    username: root
+  flyway:
+    url: jdbc:mariadb://localhost:3306/storer2db
+    user: root
+    password: password
+    locations: classpath:db/migration
