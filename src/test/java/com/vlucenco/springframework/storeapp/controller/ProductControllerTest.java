@@ -20,6 +20,8 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
 
+    public static final String PRODUCTS_PATH = "/api/v1/products";
+
     private WebTestClient webTestClient;
 
     @Mock
@@ -44,7 +46,7 @@ class ProductControllerTest {
     void getAllProducts() {
         BDDMockito.given(productService.getAllProducts()).willReturn(Flux.just(product1, product2));
 
-        webTestClient.get().uri("/api/v1/products")
+        webTestClient.get().uri(PRODUCTS_PATH)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Product.class)
@@ -55,7 +57,7 @@ class ProductControllerTest {
     void getProductById() {
         BDDMockito.given(productService.getProduct(any())).willReturn(Mono.just(product1));
 
-        webTestClient.get().uri("/api/v1/products/product1")
+        webTestClient.get().uri(PRODUCTS_PATH + "/product1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Product.class);

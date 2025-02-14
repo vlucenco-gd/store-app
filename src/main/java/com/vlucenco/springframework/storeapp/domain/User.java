@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 public class User {
     @Id
-    private String id;
+    private Long id;
     private String email;
     private String password;
 }

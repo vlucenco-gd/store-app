@@ -21,6 +21,7 @@ import static org.mockito.Mockito.times;
 class ProductServiceTest {
 
     public static final String ID_ONE = "1";
+
     @Mock
     private ProductRepository productRepository;
 
