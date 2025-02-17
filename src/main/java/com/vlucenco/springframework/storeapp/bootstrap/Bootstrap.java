@@ -1,11 +1,11 @@
 package com.vlucenco.springframework.storeapp.bootstrap;
 
 import com.vlucenco.springframework.storeapp.domain.Product;
-import com.vlucenco.springframework.storeapp.domain.User;
 import com.vlucenco.springframework.storeapp.repository.ProductRepository;
-import com.vlucenco.springframework.storeapp.repository.UserRepository;
+import com.vlucenco.springframework.storeapp.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 
@@ -13,11 +13,11 @@ import java.math.BigDecimal;
 public class Bootstrap implements CommandLineRunner {
 
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public Bootstrap(ProductRepository productRepository, UserRepository userRepository) {
+    public Bootstrap(ProductRepository productRepository, UserService userService) {
         this.productRepository = productRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class Bootstrap implements CommandLineRunner {
             loadProducts();
         }
 
-        if (userRepository.count().block() == 0) {
+        if (CollectionUtils.isEmpty(userService.getAllUsers().collectList().block())) {
             loadUsers();
         }
     }
@@ -52,14 +52,9 @@ public class Bootstrap implements CommandLineRunner {
     private void loadUsers() {
         System.out.println("#### Loading Users Bootstrap Data ####");
 
-        userRepository.save(User.builder()
-                        .email("user1@email.moc").password("user1pas123").build())
-                .block();
+        userService.registerUser("user1@email.moc", "user1pas123").block();
+        userService.registerUser("user2@email.moc", "user2pas123").block();
 
-        userRepository.save(User.builder()
-                        .email("user2@email.moc").password("user2pas123").build())
-                .block();
-
-        System.out.println("Loaded Users: " + userRepository.count().block());
+        System.out.println("Loaded Users: " + userService.getAllUsers().count().block());
     }
 }
