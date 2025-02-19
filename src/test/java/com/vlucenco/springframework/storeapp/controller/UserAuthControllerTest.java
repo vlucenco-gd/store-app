@@ -1,6 +1,7 @@
 package com.vlucenco.springframework.storeapp.controller;
 
 import com.vlucenco.springframework.storeapp.domain.User;
+import com.vlucenco.springframework.storeapp.security.JwtUtil;
 import com.vlucenco.springframework.storeapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 class UserAuthControllerTest {
 
     public static final String AUTH_PATH = "/api/v1/auth";
+
     private WebTestClient webTestClient;
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private JwtUtil jwtUtil;
 
     @InjectMocks
     private UserAuthController userAuthController;
@@ -51,10 +56,15 @@ class UserAuthControllerTest {
     void login() {
         BDDMockito.given(userService.authenticate(anyString(), anyString()))
                 .willReturn(Mono.just(user1));
+        BDDMockito.given(jwtUtil.generateToken(anyString()))
+                .willReturn("token");
 
         webTestClient.post()
                 .uri(AUTH_PATH + "/login?email=user@mail.moc&password=user1pas123")
                 .exchange()
                 .expectStatus().isOk();
+
+        BDDMockito.verify(userService).authenticate(anyString(), anyString());
+        BDDMockito.verify(jwtUtil).generateToken(anyString());
     }
 }

@@ -1,6 +1,7 @@
 package com.vlucenco.springframework.storeapp.service;
 
 import com.vlucenco.springframework.storeapp.domain.User;
+import com.vlucenco.springframework.storeapp.exception.UserAlreadyExistsException;
 import com.vlucenco.springframework.storeapp.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class UserServiceTest {
 
     @Test
     void registerUser() {
+        BDDMockito.given(userRepository.findByEmail("user1@mail.moc"))
+                .willReturn(Mono.empty());
+
         BDDMockito.given(userRepository.save(any()))
                 .willReturn(Mono.just(user1));
 
@@ -78,5 +82,18 @@ class UserServiceTest {
                 .verifyComplete();
 
         BDDMockito.then(userRepository).should().findByEmail(user1.getEmail());
+    }
+
+    @Test
+    void thorExceptionWhenRegisteringDuplicateUser() {
+        BDDMockito.given(userRepository.findByEmail("user1@mail.moc"))
+                .willReturn(Mono.just(user1));
+
+        StepVerifier.create(userService.registerUser(user1.getEmail(), user1.getPassword()))
+                .expectError(UserAlreadyExistsException.class)
+                .verify();
+
+        BDDMockito.then(userRepository).should().findByEmail(user1.getEmail());
+        BDDMockito.then(userRepository).shouldHaveNoMoreInteractions();
     }
 }

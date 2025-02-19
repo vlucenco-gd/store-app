@@ -1,6 +1,7 @@
 package com.vlucenco.springframework.storeapp.service;
 
 import com.vlucenco.springframework.storeapp.domain.User;
+import com.vlucenco.springframework.storeapp.exception.UserAlreadyExistsException;
 import com.vlucenco.springframework.storeapp.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,12 @@ public class UserService {
     }
 
     public Mono<User> registerUser(String email, String password) {
+        return userRepository.findByEmail(email)
+                .flatMap(existingUser -> Mono.<User>error(UserAlreadyExistsException::new))
+                .switchIfEmpty(Mono.defer(() -> register(email, password)));
+    }
+
+    private Mono<User> register(String email, String password) {
         User user = User.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
