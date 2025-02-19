@@ -1,7 +1,7 @@
 package com.vlucenco.springframework.storeapp.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.vlucenco.springframework.storeapp.exception.JwtAuthenticationException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,12 +50,23 @@ public class JwtUtil {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = Jwts.parser()
+        try {
+            Claims claims = parseToken(token);
+            return claimsResolver.apply(claims);
+        } catch (ExpiredJwtException ex) {
+            throw new JwtAuthenticationException("Token has expired. Please log in again.");
+        } catch (MalformedJwtException | UnsupportedJwtException ex) {
+            throw new JwtAuthenticationException("Invalid token.");
+        } catch (IllegalArgumentException ex) {
+            throw new JwtAuthenticationException("Token is missing.");
+        }
+    }
+
+    private Claims parseToken(String token) {
+        return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-
-        return claimsResolver.apply(claims);
     }
 }
