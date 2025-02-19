@@ -1,7 +1,5 @@
 package com.vlucenco.springframework.storeapp.security;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -15,6 +13,9 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.Optional;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 public class JwtAuthenticationFilter extends AuthenticationWebFilter {
@@ -28,23 +29,42 @@ public class JwtAuthenticationFilter extends AuthenticationWebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
-        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        Optional<String> tokenOpt = extractToken(exchange);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            String username = jwtUtil.getUserNameFromJwtToken(token);
+        return tokenOpt
+                .map(this::parseUserName)
+                .flatMap(username -> getSecurityContext(username, tokenOpt.get()))
+                .map(securityContext -> chainSecurityContext(exchange, chain, securityContext))
+                .orElseGet(() -> chain.filter(exchange));
+    }
 
-            if (username != null && jwtUtil.validateToken(token, username)) {
-                UserDetails userDetails = new User(username, "", Collections.emptyList());
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContext securityContext = new SecurityContextImpl(auth);
+    private static Mono<Void> chainSecurityContext(ServerWebExchange exchange, WebFilterChain chain, SecurityContext securityContext) {
+        return chain.filter(exchange)
+                .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
+    }
 
-                return chain.filter(exchange)
-                        .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
-            }
+    private Optional<SecurityContext> getSecurityContext(String username, String token) {
+
+        if (username == null || !jwtUtil.validateToken(token, username)) {
+            return Optional.empty();
         }
 
-        return chain.filter(exchange);
+        UserDetails userDetails = new User(username, "", Collections.emptyList());
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        return Optional.of(new SecurityContextImpl(auth));
+    }
+
+    private Optional<String> extractToken(ServerWebExchange exchange) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(AUTHORIZATION);
+
+        return Optional.ofNullable(authHeader)
+                .filter(auth -> authHeader.startsWith("Bearer "))
+                .map(auth -> auth.substring(7));
+    }
+
+    private String parseUserName(String token) {
+        return jwtUtil.getUserNameFromJwtToken(token);
     }
 }
