@@ -1,6 +1,6 @@
 package com.vlucenco.springframework.storeapp.service;
 
-import com.vlucenco.springframework.storeapp.model.User;
+import com.vlucenco.springframework.storeapp.model.entity.User;
 import com.vlucenco.springframework.storeapp.exception.UserAlreadyExistsException;
 import com.vlucenco.springframework.storeapp.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

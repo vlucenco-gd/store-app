@@ -1,6 +1,6 @@
 package com.vlucenco.springframework.storeapp.bootstrap;
 
-import com.vlucenco.springframework.storeapp.model.Product;
+import com.vlucenco.springframework.storeapp.model.entity.Product;
 import com.vlucenco.springframework.storeapp.repository.ProductRepository;
 import com.vlucenco.springframework.storeapp.service.UserService;
 import org.springframework.boot.CommandLineRunner;

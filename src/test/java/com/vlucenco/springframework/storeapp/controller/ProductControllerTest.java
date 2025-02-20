@@ -1,6 +1,6 @@
 package com.vlucenco.springframework.storeapp.controller;
 
-import com.vlucenco.springframework.storeapp.model.Product;
+import com.vlucenco.springframework.storeapp.model.entity.Product;
 import com.vlucenco.springframework.storeapp.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

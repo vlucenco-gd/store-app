@@ -1,6 +1,6 @@
 package com.vlucenco.springframework.storeapp.controller;
 
-import com.vlucenco.springframework.storeapp.model.User;
+import com.vlucenco.springframework.storeapp.model.entity.User;
 import com.vlucenco.springframework.storeapp.security.JwtUtil;
 import com.vlucenco.springframework.storeapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;

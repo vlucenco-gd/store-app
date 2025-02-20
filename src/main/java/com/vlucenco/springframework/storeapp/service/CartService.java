@@ -1,7 +1,7 @@
 package com.vlucenco.springframework.storeapp.service;
 
-import com.vlucenco.springframework.storeapp.model.Cart;
-import com.vlucenco.springframework.storeapp.model.Product;
+import com.vlucenco.springframework.storeapp.model.entity.Cart;
+import com.vlucenco.springframework.storeapp.model.entity.Product;
 import com.vlucenco.springframework.storeapp.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

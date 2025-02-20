@@ -1,6 +1,6 @@
 package com.vlucenco.springframework.storeapp.service;
 
-import com.vlucenco.springframework.storeapp.model.Product;
+import com.vlucenco.springframework.storeapp.model.entity.Product;
 import com.vlucenco.springframework.storeapp.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

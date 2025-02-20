@@ -1,4 +1,4 @@
-package com.vlucenco.springframework.storeapp.model;
+package com.vlucenco.springframework.storeapp.model.entity;
 
 import lombok.Builder;
 import lombok.Data;

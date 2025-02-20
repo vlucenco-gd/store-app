@@ -1,5 +1,7 @@
 package com.vlucenco.springframework.storeapp.model;
 
+import com.vlucenco.springframework.storeapp.model.entity.Cart;
+import com.vlucenco.springframework.storeapp.model.entity.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
