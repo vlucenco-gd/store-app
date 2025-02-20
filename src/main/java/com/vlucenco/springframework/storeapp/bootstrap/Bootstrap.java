@@ -35,15 +35,15 @@ public class Bootstrap implements CommandLineRunner {
         System.out.println("#### Loading Products Bootstrap Data ####");
 
         productRepository.save(Product.builder()
-                        .name("Table").price(BigDecimal.valueOf(100)).build())
+                        .name("Table").price(BigDecimal.valueOf(100)).availableQuantity(10).build())
                 .block();
 
         productRepository.save(Product.builder()
-                        .name("Chair").price(BigDecimal.valueOf(30)).build())
+                        .name("Chair").price(BigDecimal.valueOf(30)).availableQuantity(10).build())
                 .block();
 
         productRepository.save(Product.builder()
-                        .name("Lamp").price(BigDecimal.valueOf(20)).build())
+                        .name("Lamp").price(BigDecimal.valueOf(20)).availableQuantity(10).build())
                 .block();
 
         System.out.println("Loaded Products: " + productRepository.count().block());
