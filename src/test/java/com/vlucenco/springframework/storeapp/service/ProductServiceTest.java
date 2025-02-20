@@ -1,6 +1,6 @@
 package com.vlucenco.springframework.storeapp.service;
 
-import com.vlucenco.springframework.storeapp.domain.Product;
+import com.vlucenco.springframework.storeapp.model.Product;
 import com.vlucenco.springframework.storeapp.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

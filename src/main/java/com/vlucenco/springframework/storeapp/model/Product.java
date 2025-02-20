@@ -1,4 +1,4 @@
-package com.vlucenco.springframework.storeapp.domain;
+package com.vlucenco.springframework.storeapp.model;
 
 import lombok.Builder;
 import lombok.Data;

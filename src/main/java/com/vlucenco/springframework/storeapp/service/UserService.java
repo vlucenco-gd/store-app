@@ -1,6 +1,6 @@
 package com.vlucenco.springframework.storeapp.service;
 
-import com.vlucenco.springframework.storeapp.domain.User;
+import com.vlucenco.springframework.storeapp.model.User;
 import com.vlucenco.springframework.storeapp.exception.UserAlreadyExistsException;
 import com.vlucenco.springframework.storeapp.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

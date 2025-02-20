@@ -1,6 +1,6 @@
 package com.vlucenco.springframework.storeapp.repository;
 
-import com.vlucenco.springframework.storeapp.domain.Cart;
+import com.vlucenco.springframework.storeapp.model.Cart;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
