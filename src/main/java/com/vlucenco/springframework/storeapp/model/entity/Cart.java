@@ -15,12 +15,15 @@ import java.util.Map;
 public class Cart {
     @Id
     private String sessionId;
-    private final Map<String, CartItem> items = new HashMap<>();
+
+    @Builder.Default
+    private Map<String, CartItem> items = new HashMap<>();
 
     public void addProduct(Product product, int quantity) {
         items.compute(product.getId(), (id, existingItem) -> {
             if (existingItem == null) {
-                return new CartItem(product, quantity);
+                int newItemRef = items.size() + 1;
+                return CartItem.builder().itemRef(newItemRef).product(product).quantity(quantity).build();
             } else {
                 existingItem.setQuantity(existingItem.getQuantity() + quantity);
                 return existingItem;

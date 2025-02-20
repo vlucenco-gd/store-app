@@ -41,7 +41,7 @@ public class CartService {
         return getOrCreateCart(sessionId).map(Cart::calculateSubtotal);
     }
 
-    public Mono<Cart> getCartBySession(String sessionId) {
+    public Mono<Cart> getCart(String sessionId) {
         return getOrCreateCart(sessionId);
     }
 
