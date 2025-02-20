@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -14,7 +15,7 @@ import java.util.Map;
 public class Cart {
     @Id
     private String sessionId;
-    private Map<String, CartItem> items;
+    private final Map<String, CartItem> items = new HashMap<>();
 
     public void addProduct(Product product, int quantity) {
         items.compute(product.getId(), (id, existingItem) -> {

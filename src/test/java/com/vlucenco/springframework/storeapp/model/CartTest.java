@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,9 +15,11 @@ class CartTest {
 
     @BeforeEach
     void setUp() {
-        cart = new Cart("session-123", new HashMap<>());
-        product1 = new Product("1", "Product A", new BigDecimal("10.50"), 10);
-        product2 = new Product("2", "Product B", new BigDecimal("20.00"), 5);
+        cart = Cart.builder().sessionId("session-123").build();
+        product1 = Product.builder().id("1").name("Product A")
+                .price(BigDecimal.valueOf(10.50)).availableQuantity(10).build();
+        product2 = Product.builder().id("2").name("Product B")
+                .price(BigDecimal.valueOf(20.00)).availableQuantity(5).build();
     }
 
     @Test
