@@ -17,38 +17,38 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ProductService productService;
 
-    public Mono<Cart> addProductToCart(String sessionId, String productId, int quantity) {
+    public Mono<Cart> addProductToCart(String userId, String productId, int quantity) {
         return productService.getProduct(productId)
                 .flatMap(product -> validateStock(product, quantity))
-                .flatMap(product -> getOrCreateCart(sessionId)
+                .flatMap(product -> getOrCreateCart(userId)
                         .flatMap(cart -> addProductAndSave(cart, product, quantity)));
     }
 
-    public Mono<Cart> updateCartItem(String sessionId, String productId, int quantity) {
+    public Mono<Cart> updateCartItem(String userId, String productId, int quantity) {
         return productService.getProduct(productId)
                 .flatMap(product -> validateStock(product, quantity))
-                .flatMap(product -> getOrCreateCart(sessionId))
+                .flatMap(product -> getOrCreateCart(userId))
                 .flatMap(cart -> updateCartAndSave(cart, productId, quantity))
                 .flatMap(this::deleteCartIfEmpty);
     }
 
-    public Mono<Cart> removeProductFromCart(String sessionId, String productId) {
-        return getOrCreateCart(sessionId)
+    public Mono<Cart> removeProductFromCart(String userId, String productId) {
+        return getOrCreateCart(userId)
                 .flatMap(cart -> removeProductAndSave(cart, productId))
                 .flatMap(this::deleteCartIfEmpty);
     }
 
-    public Mono<BigDecimal> getCartSubtotal(String sessionId) {
-        return getOrCreateCart(sessionId).map(Cart::calculateSubtotal);
+    public Mono<BigDecimal> getCartSubtotal(String userId) {
+        return getOrCreateCart(userId).map(Cart::calculateSubtotal);
     }
 
-    public Mono<Cart> getCart(String sessionId) {
-        return getOrCreateCart(sessionId);
+    public Mono<Cart> getCart(String userId) {
+        return getOrCreateCart(userId);
     }
 
-    private Mono<Cart> getOrCreateCart(String sessionId) {
-        return cartRepository.findById(sessionId)
-                .defaultIfEmpty(Cart.builder().sessionId(sessionId).build());
+    private Mono<Cart> getOrCreateCart(String userId) {
+        return cartRepository.findById(userId)
+                .defaultIfEmpty(Cart.builder().userId(userId).build());
     }
 
     private Mono<Product> validateStock(Product product, int quantity) {
@@ -59,7 +59,7 @@ public class CartService {
 
     private Mono<Cart> deleteCartIfEmpty(Cart cart) {
         return cart.getItems().isEmpty()
-                ? cartRepository.deleteById(cart.getSessionId()).then(Mono.empty())
+                ? cartRepository.deleteById(cart.getUserId()).then(Mono.empty())
                 : Mono.just(cart);
     }
 

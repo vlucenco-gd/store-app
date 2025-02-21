@@ -37,7 +37,7 @@ class CartServiceTest {
         product = Product.builder().id("1").name("Sample Product")
                 .price(BigDecimal.valueOf(10.00)).availableQuantity(5).build();
 
-        cart = Cart.builder().sessionId(sessionId).build();
+        cart = Cart.builder().userId(sessionId).build();
     }
 
     @Test
@@ -71,7 +71,7 @@ class CartServiceTest {
     void shouldDeleteCartWhenCartIsEmptyAfterItemRemoval() {
         cart.addProduct(product, 1);
         when(cartRepository.findById(sessionId)).thenReturn(Mono.just(cart));
-        when(cartRepository.save(any())).thenReturn(Mono.just(Cart.builder().sessionId(sessionId).build()));
+        when(cartRepository.save(any())).thenReturn(Mono.just(Cart.builder().userId(sessionId).build()));
         when(cartRepository.deleteById(sessionId)).thenReturn(Mono.empty());
 
         StepVerifier.create(cartService.removeProductFromCart(sessionId, "1"))
@@ -116,7 +116,7 @@ class CartServiceTest {
 
         when(productService.getProduct("1")).thenReturn(Mono.just(product));
         when(cartRepository.findById(sessionId)).thenReturn(Mono.just(cart));
-        when(cartRepository.save(any())).thenReturn(Mono.just(Cart.builder().sessionId(sessionId).build()));
+        when(cartRepository.save(any())).thenReturn(Mono.just(Cart.builder().userId(sessionId).build()));
         when(cartRepository.deleteById(sessionId)).thenReturn(Mono.empty());
 
         StepVerifier.create(cartService.updateCartItem(sessionId, "1", 0)) // Setting quantity to 0

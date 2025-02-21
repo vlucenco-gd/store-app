@@ -12,13 +12,13 @@ import java.util.List;
 @Builder
 public class CartResponse {
 
-    private String sessionId;
+    private String userId;
     private List<CartItemResponse> items;
     private BigDecimal subtotal;
 
     public static CartResponse from(Cart cart) {
         return CartResponse.builder()
-                .sessionId(cart.getSessionId())
+                .userId(cart.getUserId())
                 .items(cart.getItems().values().stream()
                         .map(CartItemResponse::fromCartItem)
                         .toList())

@@ -17,7 +17,7 @@ class CartTest {
 
     @BeforeEach
     void setUp() {
-        cart = Cart.builder().sessionId("session-123").build();
+        cart = Cart.builder().userId("session-123").build();
         product1 = Product.builder().id("1").name("Product A")
                 .price(BigDecimal.valueOf(10.50)).availableQuantity(10).build();
         product2 = Product.builder().id("2").name("Product B")

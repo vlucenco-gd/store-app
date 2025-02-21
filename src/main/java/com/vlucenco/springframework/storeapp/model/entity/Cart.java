@@ -14,7 +14,7 @@ import java.util.Map;
 @Document(collection = "carts")
 public class Cart {
     @Id
-    private String sessionId;
+    private String userId;
 
     @Builder.Default
     private Map<String, CartItem> items = new HashMap<>();

@@ -6,12 +6,14 @@ import com.vlucenco.springframework.storeapp.model.dto.CartResponse;
 import com.vlucenco.springframework.storeapp.model.entity.Cart;
 import com.vlucenco.springframework.storeapp.model.entity.CartItem;
 import com.vlucenco.springframework.storeapp.model.entity.Product;
+import com.vlucenco.springframework.storeapp.security.JwtUtil;
 import com.vlucenco.springframework.storeapp.service.CartService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -19,6 +21,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -27,11 +30,14 @@ import static org.mockito.Mockito.when;
 class CartControllerTest {
 
     public static final String CART_PATH = "/api/v1/cart";
+    public static final String USERNAME = "test-user";
 
     private WebTestClient webTestClient;
 
     @Mock
     private CartService cartService;
+    @Mock
+    private JwtUtil jwtUtil;
 
     @InjectMocks
     private CartController cartController;
@@ -57,9 +63,11 @@ class CartControllerTest {
                 .build();
 
         cart = Cart.builder()
-                .sessionId("test-session")
+                .userId(USERNAME)
                 .items(Collections.singletonMap("1", cartItem))
                 .build();
+
+        when(jwtUtil.extractUserId(any())).thenReturn(USERNAME);
     }
 
     @Test
@@ -69,19 +77,20 @@ class CartControllerTest {
         when(cartService.addProductToCart(any(), any(), anyInt())).thenReturn(Mono.just(cart));
 
         webTestClient.post()
-                .uri(CART_PATH + "/test-session/add")
+                .uri(CART_PATH + "/add")
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(CartResponse.class);
+                .expectBody(CartResponse.class)
+                .value(cartResponse -> assertEquals(USERNAME, cartResponse.getUserId()));
     }
 
     @Test
     void getCart_ShouldReturnCartResponse() {
-        when(cartService.getCart("test-session")).thenReturn(Mono.just(cart));
+        when(cartService.getCart(USERNAME)).thenReturn(Mono.just(cart));
 
         webTestClient.get()
-                .uri(CART_PATH + "/test-session")
+                .uri(CART_PATH)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(CartResponse.class);
@@ -93,7 +102,7 @@ class CartControllerTest {
         when(cartService.updateCartItem(any(), any(), anyInt())).thenReturn(Mono.just(cart));
 
         webTestClient.put()
-                .uri(CART_PATH + "/test-session/update")
+                .uri(CART_PATH + "/update")
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().isOk()
@@ -105,7 +114,7 @@ class CartControllerTest {
         when(cartService.removeProductFromCart(any(), any())).thenReturn(Mono.just(cart));
 
         webTestClient.delete()
-                .uri(CART_PATH + "/test-session/remove/1")
+                .uri(CART_PATH + "/remove/1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(CartResponse.class);
@@ -118,7 +127,7 @@ class CartControllerTest {
                 .thenReturn(Mono.error(new NotEnoughStockException()));
 
         webTestClient.post()
-                .uri(CART_PATH + "/test-session/add")
+                .uri(CART_PATH + "/add")
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is4xxClientError();

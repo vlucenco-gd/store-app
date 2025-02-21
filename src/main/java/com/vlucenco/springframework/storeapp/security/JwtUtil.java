@@ -5,6 +5,8 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -18,6 +20,10 @@ public class JwtUtil {
 
     @Value("${store.app.jwtExpirationMs}")
     private int jwtExpirationMs;
+
+    public String extractUserId(UsernamePasswordAuthenticationToken auth) {
+        return ((User) auth.getPrincipal()).getUsername();
+    }
 
     public String generateToken(String email) {
         return Jwts.builder()
