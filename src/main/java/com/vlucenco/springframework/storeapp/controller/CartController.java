@@ -2,7 +2,6 @@ package com.vlucenco.springframework.storeapp.controller;
 
 import com.vlucenco.springframework.storeapp.model.dto.CartItemRequest;
 import com.vlucenco.springframework.storeapp.model.dto.CartResponse;
-import com.vlucenco.springframework.storeapp.model.entity.Cart;
 import com.vlucenco.springframework.storeapp.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,7 @@ public class CartController {
 
     @PostMapping("/{sessionId}/add")
     public Mono<ResponseEntity<CartResponse>> addProductToCart(@PathVariable String sessionId,
-                                                       @RequestBody CartItemRequest request) {
+                                                               @RequestBody CartItemRequest request) {
         return cartService.addProductToCart(sessionId, request.getProductId(), request.getQuantity())
                 .map(cart -> ResponseEntity.ok(CartResponse.from(cart)));
     }
@@ -30,16 +29,16 @@ public class CartController {
     }
 
     @DeleteMapping("/{sessionId}/remove/{productId}")
-    public Mono<ResponseEntity<Void>> removeProductFromCart(@PathVariable String sessionId,
-                                                             @PathVariable String productId) {
+    public Mono<ResponseEntity<CartResponse>> removeProductFromCart(@PathVariable String sessionId,
+                                                            @PathVariable String productId) {
         return cartService.removeProductFromCart(sessionId, productId)
-                .then(Mono.just(ResponseEntity.noContent().build()));
+                .map(cart -> ResponseEntity.ok(CartResponse.from(cart)));
     }
 
-    @PatchMapping("/{sessionId}/update")
-    public Mono<ResponseEntity<Cart>> updateCartItem(@PathVariable String sessionId,
-                                                      @RequestBody CartItemRequest request) {
+    @PutMapping("/{sessionId}/update")
+    public Mono<ResponseEntity<CartResponse>> updateCartItem(@PathVariable String sessionId,
+                                                             @RequestBody CartItemRequest request) {
         return cartService.updateCartItem(sessionId, request.getProductId(), request.getQuantity())
-                .map(ResponseEntity::ok);
+                .map(cart -> ResponseEntity.ok(CartResponse.from(cart)));
     }
 }

@@ -1,5 +1,6 @@
 package com.vlucenco.springframework.storeapp.controller;
 
+import com.vlucenco.springframework.storeapp.exception.NotEnoughStockException;
 import com.vlucenco.springframework.storeapp.model.dto.CartItemRequest;
 import com.vlucenco.springframework.storeapp.model.dto.CartResponse;
 import com.vlucenco.springframework.storeapp.model.entity.Cart;
@@ -84,5 +85,42 @@ class CartControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(CartResponse.class);
+    }
+
+    @Test
+    void updateCartItem_ShouldModifyCartAndReturnUpdatedResponse() {
+        CartItemRequest request = new CartItemRequest("1", 5);
+        when(cartService.updateCartItem(any(), any(), anyInt())).thenReturn(Mono.just(cart));
+
+        webTestClient.put()
+                .uri(CART_PATH + "/test-session/update")
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CartResponse.class);
+    }
+
+    @Test
+    void removeProductFromCart_ShouldReturnUpdatedCart() {
+        when(cartService.removeProductFromCart(any(), any())).thenReturn(Mono.just(cart));
+
+        webTestClient.delete()
+                .uri(CART_PATH + "/test-session/remove/1")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CartResponse.class);
+    }
+
+    @Test
+    void addProductToCart_ShouldReturnError_WhenStockIsInsufficient() {
+        CartItemRequest request = new CartItemRequest("1", 20);
+        when(cartService.addProductToCart(any(), any(), anyInt()))
+                .thenReturn(Mono.error(new NotEnoughStockException()));
+
+        webTestClient.post()
+                .uri(CART_PATH + "/test-session/add")
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 }
