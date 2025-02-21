@@ -1,5 +1,6 @@
 package com.vlucenco.springframework.storeapp.service;
 
+import com.vlucenco.springframework.storeapp.exception.NotEnoughStockException;
 import com.vlucenco.springframework.storeapp.model.entity.Cart;
 import com.vlucenco.springframework.storeapp.model.entity.Product;
 import com.vlucenco.springframework.storeapp.repository.CartRepository;
@@ -53,7 +54,7 @@ public class CartService {
     private Mono<Product> validateStock(Product product, int quantity) {
         return Mono.just(product)
                 .filter(p -> p.getAvailableQuantity() >= quantity)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Not enough stock available")));
+                .switchIfEmpty(Mono.error(new NotEnoughStockException()));
     }
 
     private Mono<Cart> deleteCartIfEmpty(Cart cart) {
