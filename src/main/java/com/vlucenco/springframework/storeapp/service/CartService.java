@@ -2,10 +2,13 @@ package com.vlucenco.springframework.storeapp.service;
 
 import com.vlucenco.springframework.storeapp.exception.NotEnoughStockException;
 import com.vlucenco.springframework.storeapp.model.entity.Cart;
+import com.vlucenco.springframework.storeapp.model.entity.CartItem;
 import com.vlucenco.springframework.storeapp.model.entity.Product;
 import com.vlucenco.springframework.storeapp.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
@@ -46,9 +49,32 @@ public class CartService {
         return getOrCreateCart(userId);
     }
 
+    public Mono<ResponseEntity<String>> checkoutCart(String userId) {
+        return getCart(userId)
+                .flatMap(this::validateCart)
+                .flatMap(cart -> cartRepository.deleteById(cart.getUserId()).thenReturn("Order placed successfully"))
+                .map(ResponseEntity::ok);
+    }
+
     private Mono<Cart> getOrCreateCart(String userId) {
         return cartRepository.findById(userId)
                 .defaultIfEmpty(Cart.builder().userId(userId).build());
+    }
+
+    private Mono<Cart> validateCart(Cart cart) {
+        return Flux.fromIterable(cart.getItems().values())
+                .flatMap(item -> productService.getProduct(item.getProduct().getId())
+                        .flatMap(product -> checkPriceChange(product, item))
+                        .flatMap(product -> validateStock(product, item.getQuantity()).thenReturn(item)))
+                .collectList()
+                .map(validItems -> cart);
+    }
+
+    private Mono<Product> checkPriceChange(Product product, CartItem item) {
+        if (product.getPrice().compareTo(item.getProduct().getPrice()) != 0) {
+            return Mono.error(new IllegalStateException("Price changed for product: " + product.getName()));
+        }
+        return Mono.just(product);
     }
 
     private Mono<Product> validateStock(Product product, int quantity) {

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -45,5 +46,12 @@ public class CartController {
                                                              @RequestBody @Validated CartItemRequest request) {
         return cartService.updateCartItem(jwtUtil.extractUserId(auth), request.getProductId(), request.getQuantity())
                 .map(cart -> ResponseEntity.ok(CartResponse.from(cart)));
+    }
+
+    @PostMapping("/checkout")
+    public Mono<ResponseEntity<String>> checkoutCart(@AuthenticationPrincipal User user) {
+        String userId = user.getUsername();
+        return cartService.checkoutCart(userId)
+                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().body(e.getMessage())));
     }
 }
