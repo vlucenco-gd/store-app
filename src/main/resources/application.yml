@@ -1,6 +1,10 @@
 spring:
+  config:
+    import: application-secret.yml
+
   application:
     name: store-app
+
   data:
     mongodb:
       uri: mongodb://localhost:27017/storemdb
@@ -13,8 +17,3 @@ spring:
     user: root
     password: password
     locations: classpath:db/migration
-
-store:
-  app:
-    jwtSecret: dzIoWTZCdjkhKjIoaT87ZEhwPWlCL0FjVV1FV1ZtL31bNCssXzhITlt2MENGa0E=
-    jwtExpirationMs: 8640000
