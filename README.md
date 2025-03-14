@@ -11,3 +11,11 @@ Before running the app make sure all dbs are up and running
 
 ##### Enter mariadb shell
 ```docker exec -it storer2db mariadb -u root -p```
+
+### Postman Collection & Environment for store-app
+
+#### How to Import in Postman
+1. Open Postman.
+2. Click **Import** → Select `postman/store-app.postman_collection.json`.
+3. Click **Import** → Select `postman/store-app.postman_environment.json`.
+4. Select the imported environment in the **top-right dropdown**.
